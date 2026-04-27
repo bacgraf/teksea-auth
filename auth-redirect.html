@@ -1,29 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Autenticando...</title>
-</head>
+<head><title>Finalizando Login...</title></head>
 <body>
-    <script src="https://alcdn.msauth.net/browser/3.27.0/js/msal-browser.min.js"></script>
     <script>
-        const msalConfig = {
-            auth: {
-                clientId: "58454a49-a299-40b0-9566-372bdab155db",
-                authority: "https://login.microsoftonline.com/f03ed2fc-3f7d-4cd8-bbd7-cf47c853931c",
-                redirectUri: "https://bacgraf.github.io/teksea-auth/auth-redirect.html"
-            },
-            cache: {
-                cacheLocation: "sessionStorage",
-                storeAuthStateInCookie: false
-            }
-        };
-
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-        msalInstance.initialize().then(() => {
-            return msalInstance.handleRedirectPromise();
-        }).catch(function(error) {
-            console.error("MSAL redirect error:", error);
-        });
+        // Esta página recebe o resultado da Microsoft e repassa para o Calibrador
+        const hash = window.location.hash || window.location.search;
+        if (hash && window.opener) {
+            // Envia o hash (token/code) para a janela principal (o Calibrador)
+            window.opener.postMessage({ type: "MSAL_AUTH_RESPONSE", payload: hash }, "*");
+            // Fecha este popup
+            window.close();
+        } else {
+            document.body.innerHTML = "<h1>Autenticação concluída. Pode fechar esta janela.</h1>";
+        }
     </script>
 </body>
 </html>
