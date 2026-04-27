@@ -4,11 +4,26 @@
     <title>Autenticando...</title>
 </head>
 <body>
+    <script src="https://alcdn.msauth.net/browser/3.27.0/js/msal-browser.min.js"></script>
     <script>
-        // Esta página serve apenas como ponte. 
-        // O MSAL na janela principal do Calibrador vai detectar o fechamento
-        // ou ler a URL desta janela para pegar o token.
-        console.log("Autenticação recebida, processando...");
+        const msalConfig = {
+            auth: {
+                clientId: "58454a49-a299-40b0-9566-372bdab155db",
+                authority: "https://login.microsoftonline.com/f03ed2fc-3f7d-4cd8-bbd7-cf47c853931c",
+                redirectUri: "https://bacgraf.github.io/teksea-auth/auth-redirect.html"
+            },
+            cache: {
+                cacheLocation: "sessionStorage",
+                storeAuthStateInCookie: false
+            }
+        };
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        msalInstance.initialize().then(() => {
+            return msalInstance.handleRedirectPromise();
+        }).catch(function(error) {
+            console.error("MSAL redirect error:", error);
+        });
     </script>
 </body>
 </html>
