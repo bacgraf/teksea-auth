@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head><title>Finalizando Login...</title></head>
-<body>
+<head><title>Ponte de Autenticação</title></head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <div id="status">Processando...</div>
     <script>
-        // Esta página recebe o resultado da Microsoft e repassa para o Calibrador
         const hash = window.location.hash || window.location.search;
-        if (hash && window.opener) {
-            // Envia o hash (token/code) para a janela principal (o Calibrador)
-            window.opener.postMessage({ type: "MSAL_AUTH_RESPONSE", payload: hash }, "*");
-            // Fecha este popup
-            window.close();
+        const statusDiv = document.getElementById("status");
+
+        if (!hash) {
+            statusDiv.innerHTML = "<h1>Erro: Nenhum token recebido da Microsoft.</h1>";
+        } else if (!window.opener) {
+            statusDiv.innerHTML = "<h1>Erro: Conexão perdida com o Calibrador (Opener is null).</h1><p>Tente fechar esta janela e clicar em ENTRAR novamente.</p>";
         } else {
-            document.body.innerHTML = "<h1>Autenticação concluída. Pode fechar esta janela.</h1>";
+            try {
+                window.opener.postMessage({ type: "MSAL_AUTH_RESPONSE", payload: hash }, "*");
+                statusDiv.innerHTML = "<h1>Sucesso!</h1><p>Enviando dados para o Calibrador...</p>";
+                setTimeout(() => window.close(), 1000);
+            } catch (e) {
+                statusDiv.innerHTML = "<h1>Erro ao enviar dados: " + e.message + "</h1>";
+            }
         }
     </script>
 </body>
